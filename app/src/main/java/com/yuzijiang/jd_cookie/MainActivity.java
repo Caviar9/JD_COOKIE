@@ -73,6 +73,9 @@ public class MainActivity extends AppCompatActivity {
     private static final String DEFAULT_CLIENT_SECRET = "";
     private static final String DEFAULT_IP = "";
     private static final String QQ_GROUP_URL = "mqqapi://card/show_pslcard?src_type=internal&version=1&uin=476250706&card_type=group&source=qrcode";
+    private static final String GITHUB_REPO_URL = "https://github.com/Caviar9/JD_COOKIE";
+    private static final String AUTHOR_QQ = "2741744509";
+    private static final String QQ_GROUP = "476250706";
 
     private String clientId;
     private String clientSecret;
@@ -211,9 +214,6 @@ public class MainActivity extends AppCompatActivity {
                             .setNegativeButton("提交", (dialog, which) -> {
                                 checkAndUpdateOrAddCookie(finalStr, getCookieValue(finalStr, PT_PIN_PATTERN));
                                 clearCookiesAndReloadWebView();
-                            })
-                            .setNeutralButton("加群", (dialog, which) -> {
-                                openQqGroup();
                             }).create().show();
                 }
 
@@ -376,27 +376,21 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
 
-            /**
-             * 复制内容到剪贴板
-             */
-            private void copyStr(String copyStr) {
-                try {
-                    //获取剪贴板管理器
-                    ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                    // 创建普通字符型ClipData
-                    ClipData mClipData = ClipData.newPlainText("Label", copyStr);
-                    // 将ClipData内容放到系统剪贴板里。
-                    cm.setPrimaryClip(mClipData);
-                } catch (Exception ignored) {
-                }
-            }
-
             private String getCookieValue(String cookie, Pattern pattern) {
                 Matcher matcher = pattern.matcher(cookie);
                 return matcher.find() ? matcher.group(2) : null;
             }
         });
         webview.loadUrl(LOGIN_URL);
+    }
+
+    private void copyStr(String text) {
+        try {
+            ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData clip = ClipData.newPlainText("Label", text);
+            cm.setPrimaryClip(clip);
+        } catch (Exception ignored) {
+        }
     }
 
     private void openQqGroup() {
@@ -436,7 +430,44 @@ public class MainActivity extends AppCompatActivity {
             showSettingsDialog();
             return true;
         }
+        if (item.getItemId() == R.id.action_about) {
+            showAboutDialog();
+            return true;
+        }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showAboutDialog() {
+        View view = getLayoutInflater().inflate(R.layout.dialog_about, null);
+
+        view.findViewById(R.id.infoQQGroup).setOnClickListener(v -> openQqGroup());
+        view.findViewById(R.id.infoAuthorQQ).setOnClickListener(v -> {
+            copyStr(AUTHOR_QQ);
+            Toast.makeText(MainActivity.this, "已复制作者QQ", Toast.LENGTH_SHORT).show();
+        });
+        view.findViewById(R.id.infoGithub).setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(GITHUB_REPO_URL));
+            try {
+                startActivity(intent);
+            } catch (ActivityNotFoundException e) {
+                Toast.makeText(MainActivity.this, "无法打开浏览器", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        new AlertDialog.Builder(this)
+                .setView(view)
+                .setCancelable(false)
+                .setPositiveButton("点个star", (dialog, which) -> {
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(GITHUB_REPO_URL));
+                    try {
+                        startActivity(intent);
+                    } catch (ActivityNotFoundException e) {
+                        Toast.makeText(MainActivity.this, "无法打开浏览器", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNeutralButton("加群", (dialog, which) -> openQqGroup())
+                .setNegativeButton("关闭", null)
+                .show();
     }
 
     private void loadServerSettings() {
