@@ -2,10 +2,13 @@ package com.yuzijiang.jd_cookie;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Build;
 import android.os.Bundle;
@@ -26,6 +29,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.progressindicator.LinearProgressIndicator;
+
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.HttpUrl;
@@ -37,6 +42,10 @@ import okhttp3.Response;
 
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
@@ -45,7 +54,6 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.Proxy;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -64,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String DEFAULT_CLIENT_ID = "";
     private static final String DEFAULT_CLIENT_SECRET = "";
     private static final String DEFAULT_IP = "";
-    private static final int MENU_SETTINGS = 1;
+    private static final String QQ_GROUP_URL = "mqqapi://card/show_pslcard?src_type=internal&version=1&uin=476250706&card_type=group&source=qrcode";
 
     private String clientId;
     private String clientSecret;
@@ -77,6 +85,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        applySystemBarInsets();
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
         loadServerSettings();
 
         WebView webview = findViewById(R.id.webview);
@@ -128,11 +138,10 @@ public class MainActivity extends AppCompatActivity {
 
         webview.setWebChromeClient(new WebChromeClient() {
             @Override
-            public void onProgressChanged(WebView view, int progress) { // 显示加载进度，自选
-                //注意textView的视图层级应该在webView上，不然就被webView遮挡住了
-                TextView progressTV = findViewById(R.id.progressTV);
-                progressTV.setText(String.format(Locale.CHINA, "%d%%", progress));
-                progressTV.setVisibility((progress > 0 && progress < 100) ? View.VISIBLE : View.GONE);
+            public void onProgressChanged(WebView view, int progress) {
+                LinearProgressIndicator progressBar = findViewById(R.id.progressBar);
+                progressBar.setProgressCompat(progress, true);
+                progressBar.setVisibility((progress > 0 && progress < 100) ? View.VISIBLE : View.GONE);
             }
 
             @Override
@@ -202,6 +211,9 @@ public class MainActivity extends AppCompatActivity {
                             .setNegativeButton("提交", (dialog, which) -> {
                                 checkAndUpdateOrAddCookie(finalStr, getCookieValue(finalStr, PT_PIN_PATTERN));
                                 clearCookiesAndReloadWebView();
+                            })
+                            .setNeutralButton("加群", (dialog, which) -> {
+                                openQqGroup();
                             }).create().show();
                 }
 
@@ -387,16 +399,40 @@ public class MainActivity extends AppCompatActivity {
         webview.loadUrl(LOGIN_URL);
     }
 
+    private void openQqGroup() {
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(QQ_GROUP_URL)));
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(this, "跳转加入QQ群：476250706 失败", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void applySystemBarInsets() {
+        View root = findViewById(R.id.mainContainer);
+        int initialLeft = root.getPaddingLeft();
+        int initialTop = root.getPaddingTop();
+        int initialRight = root.getPaddingRight();
+        int initialBottom = root.getPaddingBottom();
+        ViewCompat.setOnApplyWindowInsetsListener(root, (view, windowInsets) -> {
+            Insets systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+            view.setPadding(
+                    initialLeft + systemBars.left,
+                    initialTop + systemBars.top,
+                    initialRight + systemBars.right,
+                    initialBottom + systemBars.bottom);
+            return windowInsets;
+        });
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(0, MENU_SETTINGS, 0, "设置")
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == MENU_SETTINGS) {
+        if (item.getItemId() == R.id.action_settings) {
             showSettingsDialog();
             return true;
         }
@@ -556,8 +592,9 @@ public class MainActivity extends AppCompatActivity {
     private TextView createSettingsLabel(String text) {
         TextView label = new TextView(this);
         label.setText(text);
-        label.setTextSize(14);
-        label.setTextColor(0xFF333333);
+        label.setTextSize(13);
+        label.setPadding(0, 0, 0, (int) (4 * getResources().getDisplayMetrics().density));
+        label.setTextColor(0xFF475569);
         return label;
     }
 

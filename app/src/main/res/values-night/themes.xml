@@ -1,16 +1,40 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Theme.JD_COOKIE" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-        <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_200</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
+    <!-- Dark theme - Flat Design, Cyan palette -->
+    <style name="Theme.JD_COOKIE" parent="Theme.MaterialComponents.DayNight.NoActionBar.Bridge">
+        <!-- Primary: brighter in dark mode -->
+        <item name="colorPrimary">@color/secondary</item>
+        <item name="colorPrimaryVariant">@color/primary</item>
         <item name="colorOnPrimary">@color/black</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_200</item>
+        <item name="colorPrimaryContainer">#FF164E63</item>
+        <item name="colorOnPrimaryContainer">#FFCFFAFE</item>
+
+        <!-- Secondary -->
+        <item name="colorSecondary">#FF67E8F9</item>
+        <item name="colorSecondaryVariant">@color/secondary</item>
         <item name="colorOnSecondary">@color/black</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
-        <!-- Customize your theme here. -->
+        <item name="colorSecondaryContainer">#FF164E63</item>
+        <item name="colorOnSecondaryContainer">#FFCFFAFE</item>
+
+        <!-- Surface / Background: dark slate -->
+        <item name="android:colorBackground">#FF0F172A</item>
+        <item name="colorSurface">#FF1E293B</item>
+        <item name="colorOnSurface">#FFE2E8F0</item>
+
+        <!-- Error -->
+        <item name="colorError">#FFF87171</item>
+        <item name="colorOnError">@color/black</item>
+
+        <!-- Status bar -->
+        <item name="android:statusBarColor" tools:targetApi="l">#FF0C1929</item>
+        <item name="android:navigationBarColor" tools:targetApi="l">#FF0F172A</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
+    </style>
+
+    <!-- Settings dialog theme - dark -->
+    <style name="Theme.JD_COOKIE.Dialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="colorPrimary">@color/secondary</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorSurface">#FF1E293B</item>
+        <item name="colorOnSurface">#FFE2E8F0</item>
     </style>
 </resources>

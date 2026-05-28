@@ -1,21 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/progressTV"
-        android:textColor="@color/black"
-        android:gravity="center_horizontal"
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:elevation="0dp"
+        app:title="@string/app_name"
+        app:titleTextAppearance="@style/ToolbarTitle"
+        app:titleCentered="true"
+        app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light"
+        app:menu="@menu/toolbar_menu" />
+
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/progressBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:indicatorColor="?attr/colorSecondary"
+        app:trackColor="@color/outline_variant"
+        app:trackThickness="3dp"
+        app:indicatorTrackGapSize="0dp"
+        tools:visibility="visible"
+        android:indeterminate="false"
+        android:progress="50" />
 
     <WebView
         android:id="@+id/webview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
 </LinearLayout>
